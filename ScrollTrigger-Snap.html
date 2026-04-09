@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Native vs Fake Scroll Concept</title>
+    <title>Codinec | Stable Portfolio</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -14,9 +14,10 @@
 
     <style>
         :root {
-            --bg: #000;
-            --text: #fff;
-            --accent: #00f0ff;
+            --bg: #050505;
+            --text: #ffffff;
+            --text-muted: #888;
+            --accent: #00e5ff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,126 +26,143 @@
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
-            /* Desktop par overflow hidden kyunki GSAP handle karega */
-            overflow-x: hidden; 
+            overflow-x: hidden; /* Horizontal scrollbar hide karo */
+            min-height: 100vh;
         }
 
         /* --- Nav --- */
         nav {
             position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 2rem;
-            display: flex; justify-content: space-between; z-index: 100;
+            display: flex; justify-content: space-between; z-index: 1000;
             mix-blend-mode: difference;
+            background: rgba(5,5,5,0.8); /* Backup background */
+            backdrop-filter: blur(5px);
         }
-        .logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.5rem; }
+        .logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.4rem; letter-spacing: -1px; }
+        .nav-btn {
+            text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 20px; border-radius: 50px; font-size: 0.9rem; transition: 0.3s;
+        }
+        .nav-btn:hover { background: white; color: black; }
 
         /* --- PROGRESS BAR --- */
-        .progress-line {
-            position: fixed; top: 0; left: 0; height: 4px; background: var(--accent);
-            width: 0%; z-index: 101;
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
+            width: 0%; z-index: 1001;
         }
 
-        /* --- MAIN WRAPPER (Container) --- */
+        /* =========================================
+           DESKTOP DEFAULT STYLES (Row Layout)
+           ========================================= */
         .wrapper {
-            /* Default Desktop: Flex Row (Horizontal Layout) */
             display: flex;
-            flex-direction: row; 
+            flex-direction: row; /* Horizontal */
             width: 100%;
-            /* Height: 100vh -> Kyunki Desktop par Hum Page PIN karenge */
-            height: 100vh;
-            overflow: hidden;
+            height: 100vh;      /* Full height for pinning */
+            overflow: hidden;   /* Hide overflow */
         }
 
-        /* --- SECTIONS --- */
         .panel {
             width: 100vw;
             height: 100vh;
-            flex-shrink: 0; /* Panels shrink nahi honi chahiye */
+            flex-shrink: 0; /* Don't shrink */
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             padding: 0 4rem;
-            border-right: 1px solid #222;
+            border-right: 1px solid #1a1a1a;
         }
 
-        /* Content Styling */
+        /* --- Content Styling --- */
         .content {
             z-index: 10;
             max-width: 600px;
+            width: 100%;
         }
         
         .badge {
-            display: inline-block; padding: 5px 15px; background: #222; 
+            display: inline-block; padding: 6px 16px; background: #1a1a1a; 
             color: var(--accent); border-radius: 50px; font-size: 0.8rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
         }
 
-        h2 { font-family: 'Space Grotesk'; font-size: 3.5rem; margin-bottom: 1rem; line-height: 1; }
-        p { color: #888; line-height: 1.6; margin-bottom: 2rem; }
+        h2 { font-family: 'Space Grotesk'; font-size: 3.5rem; margin-bottom: 1.5rem; line-height: 1.1; font-weight: 700; }
+        p { color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem; font-size: 1.05rem; }
+        .link { text-decoration: none; color: white; border-bottom: 1px solid white; padding-bottom: 3px; font-size: 0.9rem; transition: 0.3s; }
+        .link:hover { color: var(--accent); border-color: var(--accent); }
 
         /* Background Numbers */
         .bg-num {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 20vw; font-weight: 700; color: rgba(255,255,255,0.03);
-            font-family: 'Space Grotesk'; pointer-events: none;
+            font-size: 20vw; font-weight: 700; color: rgba(255,255,255,0.04);
+            font-family: 'Space Grotesk'; pointer-events: none; white-space: nowrap;
         }
 
+        /* Image Box */
+        .img-box { width: 100%; height: 50vh; background: #111; border-radius: 8px; overflow: hidden; margin-top: 2rem; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+
         /* =========================================
-           MOBILE STYLES (Native Vertical Scroll)
+           MOBILE STYLES (CSS CONTROLS LAYOUT HERE)
            ========================================= */
         @media (max-width: 768px) {
             
-            /* 1. Body ko normal scroll kar do */
-            body { overflow-x: hidden; overflow-y: auto; }
+            /* 1. Body ko normal scroll allow karo */
+            body { overflow-y: auto; overflow-x: hidden; }
 
+            /* 2. Wrapper ko CSS se Vertical banao */
             .wrapper {
-                /* 2. Layout Change: Row se Column */
-                flex-direction: column;
-                /* 3. Height Auto: Content ke hisaab se height */
-                height: auto;
-                /* 4. Visible Overflow: Scroll kaam kar sake */
-                overflow: visible;
+                flex-direction: column; /* STACK VERTICAL */
+                height: auto;           /* Content ke hisaab se height */
+                overflow: visible;      /* Scroll allow karo */
                 width: 100%;
+                /* JS se override hone se bachane ke liye important nahi, lekin specific hai */
             }
 
+            /* 3. Panels ko adjust karo */
             .panel {
                 width: 100%;
-                /* Mobile: Auto height (Native scroll) */
-                height: auto;
-                min-height: 100vh; /* Kam se kam 1 screen toh bhar lo */
-                padding: 6rem 1.5rem 3rem 1.5rem;
+                height: auto;        /* Auto height */
+                min-height: 100vh;   /* Minimum 1 screen height */
+                padding: 7rem 1.5rem 3rem 1.5rem; /* Nav space ke liye top padding */
+                flex-direction: column; /* Content ko bhi stack karo */
                 border-right: none;
-                border-bottom: 1px solid #222;
+                border-bottom: 1px solid #1a1a1a;
             }
 
+            /* Content adjustments */
+            .content { margin: 0; }
+            .img-box { height: 30vh; margin-top: 1.5rem; order: -1; /* Image upar */ }
             h2 { font-size: 2.5rem; }
-            .bg-num { position: fixed; top: 15%; opacity: 0.02; }
+            .bg-num { position: fixed; top: 10%; opacity: 0.03; }
             
-            /* Progress bar hide karo mobile par */
-            .progress-line { display: none; }
+            .progress-bar { display: none; }
         }
-
     </style>
 </head>
 <body>
 
-    <div class="progress-line"></div>
+    <div class="progress-bar"></div>
 
     <nav>
-        <div class="logo">ScrollConcept.</div>
-        <a href="#" style="color:white; text-decoration:none;">Contact</a>
+        <div class="logo">Codinec.</div>
+        <a href="#" class="nav-btn">Contact</a>
     </nav>
 
-    <!-- This wrapper holds all slides -->
     <div class="wrapper">
         
         <!-- SLIDE 1 -->
         <section class="panel">
             <div class="bg-num">01</div>
             <div class="content">
-                <span class="badge">Vertical vs Horizontal</span>
-                <h2>Desktop = Fake Scroll</h2>
-                <p>Dekho, tum Upar-Neeche scroll kar rahe ho, lekin screen Left-Right move ho raha hai. Ye GSAP ka <strong>"Horizontal Pinning"</strong> hai.</p>
+                <span class="badge">Fintech</span>
+                <h2>Nexus Banking</h2>
+                <p>A secure, dark-mode-first banking interface designed for the next generation of crypto-native users.</p>
+                <a href="#" class="link">View Case Study</a>
+                <div class="img-box">
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2072&auto=format&fit=crop" alt="Project 1">
+                </div>
             </div>
         </section>
 
@@ -152,9 +170,13 @@
         <section class="panel">
             <div class="bg-num">02</div>
             <div class="content">
-                <span class="badge">Mobile = Native Scroll</span>
-                <h2>Mobile = Real Scroll</h2>
-                <p>Agar mobile par kholega, to yeh code <strong>GSAP ko disable</strong> kar dega. Tum normally Upar-Neeche swipe kar paoge. Koi trick nahi.</p>
+                <span class="badge">E-Commerce</span>
+                <h2>Velvet Store</h2>
+                <p>Headless Shopify architecture enabling lightning fast page loads and 3D product previews.</p>
+                <a href="#" class="link">View Case Study</a>
+                <div class="img-box">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop" alt="Project 2">
+                </div>
             </div>
         </section>
 
@@ -162,9 +184,13 @@
         <section class="panel">
             <div class="bg-num">03</div>
             <div class="content">
-                <span class="badge">Smooth Experience</span>
-                <h2>Best of Both Worlds</h2>
-                <p>Desktop par cinematic control (Horizontal) aur Mobile par comfortable experience (Vertical). Yeh hi modern website ka standard hai.</p>
+                <span class="badge">SaaS Platform</span>
+                <h2>Data Orbit</h2>
+                <p>Real-time analytics dashboard capable of visualizing millions of data points with zero latency.</p>
+                <a href="#" class="link">View Case Study</a>
+                <div class="img-box">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" alt="Project 3">
+                </div>
             </div>
         </section>
 
@@ -172,9 +198,10 @@
         <section class="panel">
             <div class="bg-num">04</div>
             <div class="content">
-                <span class="badge">End</span>
-                <h2>Ab Aap Samajh Gaye</h2>
-                <p>Code clean hai, logic simple hai. Bas isko copy karo aur use karo.</p>
+                <span class="badge">Next Project</span>
+                <h2>Ready to scale?</h2>
+                <p>We are accepting new projects for Q4. Let's build something amazing together.</p>
+                <a href="#" class="nav-btn" style="background: white; color: black; border: none; margin-top: 1rem;">Start Now</a>
             </div>
         </section>
 
@@ -183,109 +210,104 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        function initApp() {
-            // 1. Sabse pehle purane animations ko Kill karo (Clean slate)
+        function initScroll() {
+            // 1. Kill All Previous GSAP instances (Clean Slate)
             ScrollTrigger.getAll().forEach(t => t.kill());
             gsap.killTweensOf(".wrapper");
+            gsap.killTweensOf(".panel");
 
             const sections = gsap.utils.toArray(".panel");
             const container = document.querySelector(".wrapper");
-            const progressBar = document.querySelector(".progress-line");
+            const progressBar = document.querySelector(".progress-bar");
             
-            // 2. Check: Mobile hai ya Desktop?
+            // 2. Device Detection
             const isMobile = window.innerWidth <= 768;
 
             // ============================================================
-            // CASE A: MOBILE MODE -> NATIVE SCROLL (No GSAP Pin)
+            // MOBILE MODE: HANDLED BY CSS ONLY
+            // JS sirf animations clean karega
             // ============================================================
             if (isMobile) {
                 
-                // CSS ko batao ki ab vertical flow chalna chahiye
-                gsap.set(container, { 
-                    display: "flex", 
-                    flexDirection: "column", 
-                    height: "auto", 
-                    overflow: "visible",
-                    width: "100%"
-                });
-
-                // GSAP transforms ko remove karo (jo desktop se bache hain)
+                // IMPORTANT: Hum yahan CSS ko change nahi kar rahe (height, flex-direction).
+                // CSS Media Query already handles it perfectly.
+                
+                // Sirf GSAP ke transforms ko clear karo
                 gsap.set(sections, { 
                     x: 0, 
                     xPercent: 0, 
-                    width: "100%",
                     clearProps: "transform" 
                 });
 
-                // Koi Horizontal Scroll Trigger nahi.
-                // Bas simple fade-in animations:
+                // Simple Fade In
                 sections.forEach((section) => {
-                    gsap.from(section.querySelector(".content"), {
-                        y: 30, opacity: 0, duration: 0.8, ease: "power2.out",
-                        scrollTrigger: { trigger: section, start: "top 80%" }
-                    });
+                    const content = section.querySelector(".content");
+                    if(content) {
+                        gsap.from(content, {
+                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out",
+                            scrollTrigger: { trigger: section, start: "top 85%" }
+                        });
+                    }
                 });
 
             } 
             
             // ============================================================
-            // CASE B: DESKTOP MODE -> FAKE SCROLL (GSAP Pin + Transform)
+            // DESKTOP MODE: FAKE SCROLL LOGIC
             // ============================================================
             else {
                 
-                // CSS ko set karo Horizontal layout ke liye
+                // Desktop ke liye JS Layout Ensure kare (Safety)
                 gsap.set(container, { 
                     display: "flex", 
                     flexDirection: "row", 
                     height: "100vh", 
-                    overflow: "hidden", 
-                    width: "100%"
+                    overflow: "hidden" 
                 });
 
-                // GSAP se horizontal movement trigger karo
+                // Horizontal Animation
                 const scrollTween = gsap.to(sections, {
-                    // Logic: Har section ko left side shift karte jao
                     xPercent: -100 * (sections.length - 1),
                     ease: "none",
-                    
                     scrollTrigger: {
                         trigger: container,
-                        pin: true,        // <--- FAKE SCROLL KA MAIN DHAN
-                        scrub: 1,         // Smooth connection between wheel and animation
-                        end: "+=" + container.offsetWidth, // Scroll kitna lamba chalega
-                        
-                        // Progress bar update
+                        pin: true,        // PIN
+                        scrub: 1,         // Smooth
+                        end: "+=" + container.offsetWidth,
                         onUpdate: (self) => {
                             progressBar.style.width = (self.progress * 100) + "%";
                         }
                     }
                 });
 
-                // Desktop par text reveal animation (Horizontal entry)
+                // Text Reveal Animation
                 sections.forEach((section) => {
-                    let anim = gsap.from(section.querySelector(".content"), {
-                        x: 50, opacity: 0, duration: 1, ease: "power3.out"
-                    });
-                    ScrollTrigger.create({
-                        trigger: section,
-                        containerAnimation: scrollTween, // Link to the fake scroll
-                        start: "left center",
-                        animation: anim
-                    });
+                    const content = section.querySelector(".content");
+                    if(content) {
+                        let anim = gsap.from(content, {
+                            x: 50, opacity: 0, duration: 1, ease: "power3.out"
+                        });
+                        ScrollTrigger.create({
+                            trigger: section,
+                            containerAnimation: scrollTween,
+                            start: "left center",
+                            animation: anim
+                        });
+                    }
                 });
             }
         }
 
-        // Load par chalao
-        window.addEventListener("load", initApp);
+        // Initialize
+        window.addEventListener("load", initScroll);
 
-        // Resize par refresh karo (Mode switch ke liye)
+        // Resize Handler
         let resizeTimer;
         window.addEventListener("resize", () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                window.scrollTo(0,0); // Reset scroll to avoid jump
-                initApp();
+                window.scrollTo(0,0);
+                initScroll();
             }, 200);
         });
 
