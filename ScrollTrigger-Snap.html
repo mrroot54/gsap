@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codinec | Stable Portfolio</title>
+    <title>Codinec | Final Portfolio</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -22,11 +22,15 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html {
+            scroll-behavior: smooth; /* Native smooth scroll for mobile */
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden; /* Horizontal scrollbar hide karo */
+            overflow-x: hidden;
             min-height: 100vh;
         }
 
@@ -35,7 +39,7 @@
             position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 2rem;
             display: flex; justify-content: space-between; z-index: 1000;
             mix-blend-mode: difference;
-            background: rgba(5,5,5,0.8); /* Backup background */
+            background: rgba(5,5,5,0.8);
             backdrop-filter: blur(5px);
         }
         .logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.4rem; letter-spacing: -1px; }
@@ -52,20 +56,20 @@
         }
 
         /* =========================================
-           DESKTOP DEFAULT STYLES (Row Layout)
+           DESKTOP DEFAULT (Row Layout)
            ========================================= */
         .wrapper {
             display: flex;
-            flex-direction: row; /* Horizontal */
+            flex-direction: row; 
             width: 100%;
-            height: 100vh;      /* Full height for pinning */
-            overflow: hidden;   /* Hide overflow */
+            height: 100vh;      
+            overflow: hidden;   
         }
 
         .panel {
             width: 100vw;
             height: 100vh;
-            flex-shrink: 0; /* Don't shrink */
+            flex-shrink: 0; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -104,36 +108,31 @@
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
 
         /* =========================================
-           MOBILE STYLES (CSS CONTROLS LAYOUT HERE)
+           MOBILE STYLES (CSS Controls Layout)
            ========================================= */
         @media (max-width: 768px) {
             
-            /* 1. Body ko normal scroll allow karo */
             body { overflow-y: auto; overflow-x: hidden; }
 
-            /* 2. Wrapper ko CSS se Vertical banao */
             .wrapper {
-                flex-direction: column; /* STACK VERTICAL */
-                height: auto;           /* Content ke hisaab se height */
-                overflow: visible;      /* Scroll allow karo */
+                flex-direction: column; 
+                height: auto;           
+                overflow: visible;      
                 width: 100%;
-                /* JS se override hone se bachane ke liye important nahi, lekin specific hai */
             }
 
-            /* 3. Panels ko adjust karo */
             .panel {
                 width: 100%;
-                height: auto;        /* Auto height */
-                min-height: 100vh;   /* Minimum 1 screen height */
-                padding: 7rem 1.5rem 3rem 1.5rem; /* Nav space ke liye top padding */
-                flex-direction: column; /* Content ko bhi stack karo */
+                height: auto;        
+                min-height: 100vh;   
+                padding: 7rem 1.5rem 3rem 1.5rem; 
+                flex-direction: column; 
                 border-right: none;
                 border-bottom: 1px solid #1a1a1a;
             }
 
-            /* Content adjustments */
             .content { margin: 0; }
-            .img-box { height: 30vh; margin-top: 1.5rem; order: -1; /* Image upar */ }
+            .img-box { height: 30vh; margin-top: 1.5rem; order: -1; }
             h2 { font-size: 2.5rem; }
             .bg-num { position: fixed; top: 10%; opacity: 0.03; }
             
@@ -211,7 +210,7 @@
         gsap.registerPlugin(ScrollTrigger);
 
         function initScroll() {
-            // 1. Kill All Previous GSAP instances (Clean Slate)
+            // 1. Cleanup
             ScrollTrigger.getAll().forEach(t => t.kill());
             gsap.killTweensOf(".wrapper");
             gsap.killTweensOf(".panel");
@@ -220,19 +219,14 @@
             const container = document.querySelector(".wrapper");
             const progressBar = document.querySelector(".progress-bar");
             
-            // 2. Device Detection
+            // 2. Detection
             const isMobile = window.innerWidth <= 768;
 
             // ============================================================
-            // MOBILE MODE: HANDLED BY CSS ONLY
-            // JS sirf animations clean karega
+            // MOBILE MODE: Native Scroll
             // ============================================================
             if (isMobile) {
-                
-                // IMPORTANT: Hum yahan CSS ko change nahi kar rahe (height, flex-direction).
-                // CSS Media Query already handles it perfectly.
-                
-                // Sirf GSAP ke transforms ko clear karo
+                // Reset transforms only
                 gsap.set(sections, { 
                     x: 0, 
                     xPercent: 0, 
@@ -249,15 +243,12 @@
                         });
                     }
                 });
-
             } 
             
             // ============================================================
-            // DESKTOP MODE: FAKE SCROLL LOGIC
+            // DESKTOP MODE: Fake Scroll
             // ============================================================
             else {
-                
-                // Desktop ke liye JS Layout Ensure kare (Safety)
                 gsap.set(container, { 
                     display: "flex", 
                     flexDirection: "row", 
@@ -265,14 +256,13 @@
                     overflow: "hidden" 
                 });
 
-                // Horizontal Animation
                 const scrollTween = gsap.to(sections, {
                     xPercent: -100 * (sections.length - 1),
                     ease: "none",
                     scrollTrigger: {
                         trigger: container,
-                        pin: true,        // PIN
-                        scrub: 1,         // Smooth
+                        pin: true,
+                        scrub: 1,
                         end: "+=" + container.offsetWidth,
                         onUpdate: (self) => {
                             progressBar.style.width = (self.progress * 100) + "%";
@@ -280,7 +270,6 @@
                     }
                 });
 
-                // Text Reveal Animation
                 sections.forEach((section) => {
                     const content = section.querySelector(".content");
                     if(content) {
@@ -298,16 +287,16 @@
             }
         }
 
-        // Initialize
+        // Initialize on Load
         window.addEventListener("load", initScroll);
 
-        // Resize Handler
+        // Resize Handler - REMOVED window.scrollTo(0,0) to fix auto-scroll issue
         let resizeTimer;
         window.addEventListener("resize", () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                window.scrollTo(0,0);
-                initScroll();
+                // IMPORTANT: Scroll ko reset mat karo, waisa hi rehne do
+                initScroll(); 
             }, 200);
         });
 
