@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codinec | Hybrid Experience Portfolio</title>
+    <title>Codinec | Fixed Hybrid Portfolio</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,8 +19,8 @@
             --bg: #050505;
             --text: #ffffff;
             --text-muted: #888;
-            --accent: #00e5ff; /* Cyan */
-            --accent-2: #7c3aed; /* Violet */
+            --accent: #00e5ff;
+            --accent-2: #7c3aed;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,21 +29,20 @@
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden; /* Hide horizontal scrollbar */
+            /* Desktop: Hide horizontal overflow initially, but we will manage via JS */
+            overflow-x: hidden; 
         }
 
         /* --- Nav --- */
         nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 0; left: 0; width: 100%;
             padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             z-index: 100;
             mix-blend-mode: difference;
+            background: rgba(5,5,5,0.8);
+            backdrop-filter: blur(10px);
         }
         .logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.4rem; letter-spacing: -1px; }
         .nav-btn {
@@ -52,7 +51,7 @@
         }
         .nav-btn:hover { background: white; color: black; }
 
-        /* --- Progress Bar (Desktop Only) --- */
+        /* --- Progress Bar --- */
         .progress-bar {
             position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
             width: 0%; z-index: 101;
@@ -60,25 +59,28 @@
 
         /* --- MAIN WRAPPER --- */
         .wrapper {
+            /* Default: Desktop Flex Row (Horizontal) */
             display: flex;
-            /* Default Desktop: Horizontal */
             flex-direction: row;
             width: 100%;
-            /* Height set by JS on desktop, auto on mobile */
+            height: 100vh; /* Fixed height for desktop pinning */
+            overflow: hidden;
         }
 
         /* --- PANELS --- */
         .panel {
-            /* Desktop: Full Screen Width */
+            /* Desktop: Full Viewport Width */
             width: 100vw;
             height: 100vh;
-            flex-shrink: 0;
+            flex-shrink: 0; /* Don't shrink */
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             padding: 0 4rem;
-            overflow: hidden;
+            /* Important: Allow content to handle own overflow inside the panel */
+            overflow-y: auto; 
+            overflow-x: hidden;
         }
 
         /* --- Content Layout --- */
@@ -115,23 +117,27 @@
         }
 
         /* =========================================
-           MOBILE OVERRIDES (Natural Scroll)
+           MOBILE STYLES (Natural Scroll Override)
            ========================================= */
         @media (max-width: 768px) {
-            body { overflow-y: auto; } /* Allow normal vertical scroll */
             
+            body { overflow-x: hidden; overflow-y: auto; }
+
             .wrapper {
-                flex-direction: column; /* Stack vertically */
-                height: auto; /* Let content define height */
+                /* RESET WRAPPER FOR MOBILE */
+                flex-direction: column; 
+                height: auto; /* Auto height allows normal scroll */
                 width: 100%;
+                overflow: visible; /* Important: Allow natural scroll */
             }
 
             .panel {
+                /* RESET PANEL FOR MOBILE */
                 width: 100%;
-                height: auto; /* Auto height for natural flow */
-                min-height: 100vh; /* At least full screen */
-                padding: 6rem 1.5rem 4rem 1.5rem; /* Top padding for Nav */
-                flex-direction: column;
+                height: auto; /* Auto height */
+                min-height: 100vh; /* Minimum full screen per section */
+                padding: 7rem 1.5rem 3rem 1.5rem; /* Top padding for fixed nav */
+                overflow: visible; /* Don't clip content */
             }
 
             .panel-content {
@@ -139,22 +145,24 @@
                 display: flex;
                 flex-direction: column;
                 gap: 2rem;
-                text-align: left; /* Left align looks cleaner usually, or center */
+                text-align: left;
             }
 
-            .case-info { width: 100%; order: 2; } /* Text below image */
-            .img-box { width: 100%; height: 40vh; order: 1; } /* Image first */
+            .case-info { width: 100%; order: 2; }
+            .img-box { width: 100%; height: 35vh; order: 1; }
 
-            h2 { font-size: 2.5rem; }
-            p { font-size: 1rem; max-width: 100%; }
-            .cat { margin-bottom: 0.5rem; }
+            h2 { font-size: 2.2rem; }
+            p { font-size: 0.95rem; max-width: 100%; }
+            .cat { font-size: 0.75rem; }
 
             .bg-num { 
-                top: 10%; font-size: 20vw; opacity: 0.02; 
-                position: fixed; /* Fixed on mobile so it stays behind scroll */
+                top: 15%; font-size: 20vw; opacity: 0.02;
+                /* Keep numbers fixed for parallax effect on mobile */
+                position: fixed; 
             }
             
-            .panel:last-child .case-info { text-align: center; }
+            /* Hide Progress Bar on Mobile */
+            .progress-bar { display: none; }
         }
 
         /* Contact Panel Special */
@@ -237,110 +245,123 @@
         gsap.registerPlugin(ScrollTrigger);
 
         function initExperience() {
-            // 1. Cleanup existing triggers (for resize)
+            // 1. Kill all old triggers to prevent conflicts on resize
             ScrollTrigger.getAll().forEach(t => t.kill());
+
+            // Kill any running tweens (animations)
+            gsap.killTweensOf(".wrapper");
+            gsap.killTweensOf(".panel");
 
             const sections = gsap.utils.toArray(".panel");
             const container = document.querySelector(".wrapper");
             const progressBar = document.querySelector(".progress-bar");
             
-            // Check Screen Size
+            // Detect Mobile
             const isMobile = window.innerWidth <= 768;
 
             // ============================================================
-            // DESKTOP MODE: Cinematic, Pinned, Horizontal, Snap
+            // MOBILE MODE: Natural Vertical Scroll
             // ============================================================
-            if (!isMobile) {
+            if (isMobile) {
                 
-                // Set wrapper height explicitly for pinning
-                gsap.set(container, { height: "100vh", overflow: "hidden" });
+                // Force CSS to allow natural scroll (Just in case)
+                gsap.set(container, { 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    height: "auto", 
+                    overflow: "visible",
+                    width: "100%"
+                });
                 
-                // Main Horizontal Scroll Timeline
+                // Remove any horizontal transforms from desktop
+                gsap.set(sections, { x: 0, xPercent: 0, width: "100%", clearProps: "transform" });
+
+                // Simple Fade In Animation on Scroll
+                sections.forEach((section) => {
+                    const info = section.querySelector(".case-info");
+                    const img = section.querySelector(".img-box");
+
+                    if(info) {
+                        gsap.from(info, {
+                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out",
+                            scrollTrigger: { trigger: section, start: "top 80%" }
+                        });
+                    }
+                    if(img) {
+                        gsap.from(img, {
+                            y: 30, opacity: 0, duration: 0.8, delay: 0.1, ease: "power2.out",
+                            scrollTrigger: { trigger: section, start: "top 85%" }
+                        });
+                    }
+                });
+
+            } 
+            
+            // ============================================================
+            // DESKTOP MODE: Cinematic Horizontal Scroll
+            // ============================================================
+            else {
+                
+                // Force CSS for Horizontal Pinning
+                gsap.set(container, { 
+                    display: "flex", 
+                    flexDirection: "row", 
+                    height: "100vh", 
+                    overflow: "hidden",
+                    width: "100%"
+                });
+
+                // Reset sections just to be safe
+                gsap.set(sections, { clearProps: "all" });
+
+                // Horizontal Scroll Animation
                 const scrollTween = gsap.to(sections, {
                     xPercent: -100 * (sections.length - 1),
                     ease: "none",
                     scrollTrigger: {
                         trigger: container,
-                        pin: true,         // PIN THE SCREEN
-                        scrub: 1,          // Smooth lag
-                        snap: 1 / (sections.length - 1), // SNAP TO SECTIONS
+                        pin: true,
+                        scrub: 1,
+                        snap: 1 / (sections.length - 1),
                         end: "+=" + container.offsetWidth,
-                        
-                        // Update progress bar
                         onUpdate: (self) => {
                             progressBar.style.width = (self.progress * 100) + "%";
                         }
                     }
                 });
 
-                // Desktop Content Reveal (Horizontal entry)
+                // Content Reveal
                 sections.forEach((section) => {
                     const info = section.querySelector(".case-info");
                     const img = section.querySelector(".img-box");
 
-                    // Text enters from bottom
                     if(info) {
                         let t1 = gsap.from(info.children, {
                             y: 40, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out"
                         });
                         ScrollTrigger.create({ trigger: section, containerAnimation: scrollTween, start: "left center", animation: t1 });
                     }
-                    // Image enters from right/scale
                     if(img) {
                         let t2 = gsap.from(img, { x: 50, opacity: 0, duration: 1, ease: "power2.out" });
                         ScrollTrigger.create({ trigger: section, containerAnimation: scrollTween, start: "left center", animation: t2 });
                     }
                 });
 
-                // Desktop Parallax (Numbers move Left)
+                // Parallax
                 document.querySelectorAll(".bg-num").forEach(num => {
                     gsap.to(num, { x: -400, ease: "none", scrollTrigger: { trigger: container, scrub: true, end: "+=" + container.offsetWidth }});
                 });
-
-            } 
-            
-            // ============================================================
-            // MOBILE MODE: Natural, Vertical, No Pin
-            // ============================================================
-            else {
-                
-                // Reset styles for natural flow
-                gsap.set(container, { height: "auto", overflow: "visible" });
-                gsap.set(sections, { x: 0, xPercent: 0 }); // Remove horizontal transform
-
-                // Vertical Scroll Animations only
-                sections.forEach((section) => {
-                    const info = section.querySelector(".case-info");
-                    const img = section.querySelector(".img-box");
-
-                    // Elements fade in as you scroll down naturally
-                    if(info) {
-                        gsap.from(info, {
-                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out",
-                            scrollTrigger: { trigger: section, start: "top 75%" }
-                        });
-                    }
-                    if(img) {
-                        gsap.from(img, {
-                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out", delay: 0.1,
-                            scrollTrigger: { trigger: section, start: "top 80%" }
-                        });
-                    }
-                });
-                
-                // Hide progress bar on mobile
-                progressBar.style.width = "0%";
             }
         }
 
-        // Run on load
+        // Initialize
         window.addEventListener("load", initExperience);
-
-        // Run on resize with debounce (to prevent glitching)
+        
+        // Handle Resize
         let resizeTimer;
         window.addEventListener("resize", () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(initExperience, 200);
+            resizeTimer = setTimeout(initExperience, 200); // 200ms debounce
         });
 
     </script>
