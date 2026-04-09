@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codinec | Fixed Hybrid Portfolio</title>
+    <title>Codinec | Robust Portfolio</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,8 +29,7 @@
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
-            /* Desktop: Hide horizontal overflow initially, but we will manage via JS */
-            overflow-x: hidden; 
+            overflow-x: hidden; /* Hide horizontal scrollbar */
         }
 
         /* --- Nav --- */
@@ -57,30 +56,28 @@
             width: 0%; z-index: 101;
         }
 
-        /* --- MAIN WRAPPER --- */
+        /* =========================================
+           MAIN WRAPPER (DEFAULT DESKTOP)
+           ========================================= */
         .wrapper {
-            /* Default: Desktop Flex Row (Horizontal) */
             display: flex;
-            flex-direction: row;
+            flex-direction: row; /* Horizontal Layout */
             width: 100%;
-            height: 100vh; /* Fixed height for desktop pinning */
+            height: 100vh; /* Fixed height for pinning */
             overflow: hidden;
         }
 
         /* --- PANELS --- */
         .panel {
-            /* Desktop: Full Viewport Width */
             width: 100vw;
             height: 100vh;
-            flex-shrink: 0; /* Don't shrink */
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             padding: 0 4rem;
-            /* Important: Allow content to handle own overflow inside the panel */
-            overflow-y: auto; 
-            overflow-x: hidden;
+            overflow: hidden; /* Clip content */
         }
 
         /* --- Content Layout --- */
@@ -117,52 +114,55 @@
         }
 
         /* =========================================
-           MOBILE STYLES (Natural Scroll Override)
+           MOBILE OVERRIDES (Pure Vertical)
            ========================================= */
         @media (max-width: 768px) {
             
-            body { overflow-x: hidden; overflow-y: auto; }
+            body { overflow-y: auto; overflow-x: hidden; }
 
             .wrapper {
-                /* RESET WRAPPER FOR MOBILE */
+                /* 1. Change to Column Layout */
                 flex-direction: column; 
-                height: auto; /* Auto height allows normal scroll */
+                /* 2. Auto Height allows normal scroll */
+                height: auto;
                 width: 100%;
-                overflow: visible; /* Important: Allow natural scroll */
+                /* 3. Ensure no hidden overflow that blocks scroll */
+                overflow: visible;
             }
 
             .panel {
-                /* RESET PANEL FOR MOBILE */
                 width: 100%;
-                height: auto; /* Auto height */
-                min-height: 100vh; /* Minimum full screen per section */
-                padding: 7rem 1.5rem 3rem 1.5rem; /* Top padding for fixed nav */
-                overflow: visible; /* Don't clip content */
+                /* Mobile: Auto height (content driven) */
+                height: auto; 
+                /* Minimum height to fill screen once */
+                min-height: 100vh;
+                /* Adjust padding for Nav */
+                padding: 6rem 1.5rem 3rem 1.5rem;
+                /* Allow content to be visible if it overflows */
+                overflow: visible;
             }
 
             .panel-content {
-                grid-template-columns: 1fr; /* Stack content */
+                grid-template-columns: 1fr; /* Stack vertically */
                 display: flex;
                 flex-direction: column;
                 gap: 2rem;
-                text-align: left;
             }
 
-            .case-info { width: 100%; order: 2; }
-            .img-box { width: 100%; height: 35vh; order: 1; }
+            /* Order: Image First, Text Second */
+            .img-box { order: 1; width: 100%; height: 35vh; }
+            .case-info { order: 2; width: 100%; }
 
             h2 { font-size: 2.2rem; }
             p { font-size: 0.95rem; max-width: 100%; }
             .cat { font-size: 0.75rem; }
 
             .bg-num { 
-                top: 15%; font-size: 20vw; opacity: 0.02;
-                /* Keep numbers fixed for parallax effect on mobile */
-                position: fixed; 
+                top: 10%; font-size: 20vw; opacity: 0.02;
+                position: fixed; /* Fixed so it stays behind all content */
             }
             
-            /* Hide Progress Bar on Mobile */
-            .progress-bar { display: none; }
+            .progress-bar { display: none; } /* Hide progress bar on mobile */
         }
 
         /* Contact Panel Special */
@@ -244,11 +244,9 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        function initExperience() {
-            // 1. Kill all old triggers to prevent conflicts on resize
+        function initScroll() {
+            // 1. KILL EVERYTHING (Clean Slate)
             ScrollTrigger.getAll().forEach(t => t.kill());
-
-            // Kill any running tweens (animations)
             gsap.killTweensOf(".wrapper");
             gsap.killTweensOf(".panel");
 
@@ -256,27 +254,30 @@
             const container = document.querySelector(".wrapper");
             const progressBar = document.querySelector(".progress-bar");
             
-            // Detect Mobile
+            // 2. DETECT MODE
             const isMobile = window.innerWidth <= 768;
 
-            // ============================================================
-            // MOBILE MODE: Natural Vertical Scroll
-            // ============================================================
+            // 3. MOBILE MODE: Simple Vertical Scroll
             if (isMobile) {
                 
-                // Force CSS to allow natural scroll (Just in case)
+                // Reset wrapper styles to ensure vertical flow works
                 gsap.set(container, { 
                     display: "flex", 
                     flexDirection: "column", 
                     height: "auto", 
-                    overflow: "visible",
-                    width: "100%"
+                    overflow: "visible", 
+                    width: "100%" 
                 });
-                
-                // Remove any horizontal transforms from desktop
-                gsap.set(sections, { x: 0, xPercent: 0, width: "100%", clearProps: "transform" });
 
-                // Simple Fade In Animation on Scroll
+                // Reset sections
+                gsap.set(sections, { 
+                    x: 0, 
+                    xPercent: 0, 
+                    width: "100%",
+                    clearProps: "transform" 
+                });
+
+                // Simple Fade In Animations
                 sections.forEach((section) => {
                     const info = section.querySelector(".case-info");
                     const img = section.querySelector(".img-box");
@@ -297,30 +298,28 @@
 
             } 
             
-            // ============================================================
-            // DESKTOP MODE: Cinematic Horizontal Scroll
-            // ============================================================
+            // 4. DESKTOP MODE: Cinematic Horizontal Scroll
             else {
                 
-                // Force CSS for Horizontal Pinning
+                // Set wrapper for horizontal pinning
                 gsap.set(container, { 
                     display: "flex", 
                     flexDirection: "row", 
                     height: "100vh", 
-                    overflow: "hidden",
-                    width: "100%"
+                    overflow: "hidden", 
+                    width: "100%" 
                 });
 
-                // Reset sections just to be safe
+                // Reset sections
                 gsap.set(sections, { clearProps: "all" });
 
-                // Horizontal Scroll Animation
+                // Horizontal Animation
                 const scrollTween = gsap.to(sections, {
                     xPercent: -100 * (sections.length - 1),
                     ease: "none",
                     scrollTrigger: {
                         trigger: container,
-                        pin: true,
+                        pin: true,        // PIN ONLY ON DESKTOP
                         scrub: 1,
                         snap: 1 / (sections.length - 1),
                         end: "+=" + container.offsetWidth,
@@ -354,14 +353,18 @@
             }
         }
 
-        // Initialize
-        window.addEventListener("load", initExperience);
-        
-        // Handle Resize
+        // Initialize on Load
+        window.addEventListener("load", initScroll);
+
+        // Handle Resize (Switch between modes)
         let resizeTimer;
         window.addEventListener("resize", () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(initExperience, 200); // 200ms debounce
+            resizeTimer = setTimeout(() => {
+                // Scroll to top to prevent layout jump when switching modes
+                window.scrollTo(0, 0);
+                initScroll();
+            }, 200);
         });
 
     </script>
