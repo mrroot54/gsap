@@ -3,92 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSAP Style Pinned Section</title>
+    <title>Codinec | Hybrid Experience Portfolio</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <style>
-        body { margin: 0; font-family: sans-serif; background: #111; color: white; overflow-x: hidden; }
-        
-        section { height: 100vh; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #333; font-size: 2rem; }
+        :root {
+            --bg: #050505;
+            --text: #ffffff;
+            --text-muted: #888;
+            --accent: #00e5ff; /* Cyan */
+            --accent-2: #7c3aed; /* Violet */
+        }
 
-        /* --- THE PINNED CONTAINER --- */
-        .pinned-section {
-            height: 100vh;
-            overflow: hidden; /* Bahar wala content na dikhe */
-            position: relative;
-            background: #222;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+        }
+
+        /* --- Nav --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+        .logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.4rem; letter-spacing: -1px; }
+        .nav-btn {
+            text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 20px; border-radius: 50px; font-size: 0.9rem; transition: 0.3s;
+        }
+        .nav-btn:hover { background: white; color: black; }
+
+        /* --- Progress Bar (Desktop Only) --- */
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
+            width: 0%; z-index: 101;
         }
 
-        /* --- INNER MOVING WRAPPER --- */
-        .move-wrapper {
+        /* --- MAIN WRAPPER --- */
+        .wrapper {
             display: flex;
-            gap: 50px;
-            padding-left: 10vw; /* Shuru mein right side se */
+            /* Default Desktop: Horizontal */
+            flex-direction: row;
+            width: 100%;
+            /* Height set by JS on desktop, auto on mobile */
         }
 
-        .box {
-            width: 300px;
-            height: 200px;
-            background: #3b82f6;
-            border-radius: 12px;
-            flex-shrink: 0; /* Boxes shrink na hon */
+        /* --- PANELS --- */
+        .panel {
+            /* Desktop: Full Screen Width */
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            padding: 0 4rem;
+            overflow: hidden;
         }
-        
-        .box:nth-child(even) { background: #8b5cf6; }
 
+        /* --- Content Layout --- */
+        .panel-content {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            width: 100%;
+            max-width: 1400px;
+            z-index: 10;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        /* Text Styles */
+        .case-info { z-index: 20; }
+        .cat { color: var(--accent); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 1rem; display: block; }
+        h2 { font-family: 'Space Grotesk'; font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem; font-weight: 700; }
+        p { color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; font-size: 1rem; max-width: 450px; }
+        .link { text-decoration: none; color: white; border-bottom: 1px solid white; padding-bottom: 3px; font-size: 0.9rem; transition: 0.3s; }
+        .link:hover { color: var(--accent); border-color: var(--accent); }
+
+        /* Image */
+        .img-box {
+            width: 100%; height: 60vh; position: relative; overflow: hidden; border-radius: 8px;
+        }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s; }
+        .img-box:hover img { transform: scale(1.05); }
+
+        /* Background Numbers */
+        .bg-num {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Space Grotesk'; font-size: 25vw; font-weight: 700;
+            color: rgba(255,255,255,0.03); z-index: 1; pointer-events: none; white-space: nowrap;
+        }
+
+        /* =========================================
+           MOBILE OVERRIDES (Natural Scroll)
+           ========================================= */
+        @media (max-width: 768px) {
+            body { overflow-y: auto; } /* Allow normal vertical scroll */
+            
+            .wrapper {
+                flex-direction: column; /* Stack vertically */
+                height: auto; /* Let content define height */
+                width: 100%;
+            }
+
+            .panel {
+                width: 100%;
+                height: auto; /* Auto height for natural flow */
+                min-height: 100vh; /* At least full screen */
+                padding: 6rem 1.5rem 4rem 1.5rem; /* Top padding for Nav */
+                flex-direction: column;
+            }
+
+            .panel-content {
+                grid-template-columns: 1fr; /* Stack content */
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+                text-align: left; /* Left align looks cleaner usually, or center */
+            }
+
+            .case-info { width: 100%; order: 2; } /* Text below image */
+            .img-box { width: 100%; height: 40vh; order: 1; } /* Image first */
+
+            h2 { font-size: 2.5rem; }
+            p { font-size: 1rem; max-width: 100%; }
+            .cat { margin-bottom: 0.5rem; }
+
+            .bg-num { 
+                top: 10%; font-size: 20vw; opacity: 0.02; 
+                position: fixed; /* Fixed on mobile so it stays behind scroll */
+            }
+            
+            .panel:last-child .case-info { text-align: center; }
+        }
+
+        /* Contact Panel Special */
+        .panel.contact .panel-content { display: flex; flex-direction: column; text-align: center; }
+        .panel.contact .img-box { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- Normal Section 1 -->
-    <section>Section 1 (Normal Scroll)</section>
+    <div class="progress-bar"></div>
 
-    <!-- THE SPECIAL SECTION (Like GSAP Demos) -->
-    <div class="pinned-section">
-        <!-- Is wrapper ko hum Left se Right move karenge -->
-        <div class="move-wrapper">
-            <div class="box">Feature 01</div>
-            <div class="box">Feature 02</div>
-            <div class="box">Feature 03</div>
-            <div class="box">Feature 04</div>
-            <div class="box">Feature 05</div>
-        </div>
+    <nav>
+        <div class="logo">Codinec.</div>
+        <a href="#" class="nav-btn">Contact</a>
+    </nav>
+
+    <div class="wrapper">
+        
+        <!-- Case 01 -->
+        <section class="panel">
+            <div class="bg-num">01</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="cat">Fintech</span>
+                    <h2>Nexus<br>Banking</h2>
+                    <p>A secure, dark-mode-first banking interface designed for the next generation of crypto-native users.</p>
+                    <a href="#" class="link">View Case Study</a>
+                </div>
+                <div class="img-box">
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2072&auto=format&fit=crop" alt="Fintech">
+                </div>
+            </div>
+        </section>
+
+        <!-- Case 02 -->
+        <section class="panel">
+            <div class="bg-num">02</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="cat">E-Commerce</span>
+                    <h2>Velvet<br>Store</h2>
+                    <p>Headless Shopify architecture enabling lightning fast page loads and 3D product previews.</p>
+                    <a href="#" class="link">View Case Study</a>
+                </div>
+                <div class="img-box">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop" alt="Fashion">
+                </div>
+            </div>
+        </section>
+
+        <!-- Case 03 -->
+        <section class="panel">
+            <div class="bg-num">03</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="cat">SaaS Platform</span>
+                    <h2>Data<br>Orbit</h2>
+                    <p>Real-time analytics dashboard capable of visualizing millions of data points with zero latency.</p>
+                    <a href="#" class="link">View Case Study</a>
+                </div>
+                <div class="img-box">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" alt="SaaS">
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="panel contact">
+            <div class="panel-content">
+                <span class="cat">Start Project</span>
+                <h2>Ready to scale<br>your idea?</h2>
+                <p>We are accepting new projects for Q4.</p>
+                <a href="#" class="nav-btn" style="background: white; color: black; border: none;">Get in Touch</a>
+            </div>
+        </section>
+
     </div>
-
-    <!-- Normal Section 3 -->
-    <section>Section 3 (Scroll Continues)</section>
 
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        // 1. Wrapper select karo
-        const wrapper = document.querySelector(".move-wrapper");
-        
-        // 2. GSAP animation lagao
-        gsap.to(wrapper, {
-            // Logic: Wrapper ko Left side shift karo
-            // Total width - Window width calculate kar ke utna shift karenge
-            x: () => -(wrapper.scrollWidth - window.innerWidth),
-            
-            ease: "none", // Linear movement
-            
-            scrollTrigger: {
-                trigger: ".pinned-section", // Kaunsa section pin karna hai
-                pin: true,    // <--- YE SABSE IMPORTANT LINE HAI
-                scrub: 1,     // Smooth scrub
-                end: "+=2000" // Scroll kitna lamba chalega
-            }
-        });
-    </script>
+        function initExperience() {
+            // 1. Cleanup existing triggers (for resize)
+            ScrollTrigger.getAll().forEach(t => t.kill());
 
+            const sections = gsap.utils.toArray(".panel");
+            const container = document.querySelector(".wrapper");
+            const progressBar = document.querySelector(".progress-bar");
+            
+            // Check Screen Size
+            const isMobile = window.innerWidth <= 768;
+
+            // ============================================================
+            // DESKTOP MODE: Cinematic, Pinned, Horizontal, Snap
+            // ============================================================
+            if (!isMobile) {
+                
+                // Set wrapper height explicitly for pinning
+                gsap.set(container, { height: "100vh", overflow: "hidden" });
+                
+                // Main Horizontal Scroll Timeline
+                const scrollTween = gsap.to(sections, {
+                    xPercent: -100 * (sections.length - 1),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: container,
+                        pin: true,         // PIN THE SCREEN
+                        scrub: 1,          // Smooth lag
+                        snap: 1 / (sections.length - 1), // SNAP TO SECTIONS
+                        end: "+=" + container.offsetWidth,
+                        
+                        // Update progress bar
+                        onUpdate: (self) => {
+                            progressBar.style.width = (self.progress * 100) + "%";
+                        }
+                    }
+                });
+
+                // Desktop Content Reveal (Horizontal entry)
+                sections.forEach((section) => {
+                    const info = section.querySelector(".case-info");
+                    const img = section.querySelector(".img-box");
+
+                    // Text enters from bottom
+                    if(info) {
+                        let t1 = gsap.from(info.children, {
+                            y: 40, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out"
+                        });
+                        ScrollTrigger.create({ trigger: section, containerAnimation: scrollTween, start: "left center", animation: t1 });
+                    }
+                    // Image enters from right/scale
+                    if(img) {
+                        let t2 = gsap.from(img, { x: 50, opacity: 0, duration: 1, ease: "power2.out" });
+                        ScrollTrigger.create({ trigger: section, containerAnimation: scrollTween, start: "left center", animation: t2 });
+                    }
+                });
+
+                // Desktop Parallax (Numbers move Left)
+                document.querySelectorAll(".bg-num").forEach(num => {
+                    gsap.to(num, { x: -400, ease: "none", scrollTrigger: { trigger: container, scrub: true, end: "+=" + container.offsetWidth }});
+                });
+
+            } 
+            
+            // ============================================================
+            // MOBILE MODE: Natural, Vertical, No Pin
+            // ============================================================
+            else {
+                
+                // Reset styles for natural flow
+                gsap.set(container, { height: "auto", overflow: "visible" });
+                gsap.set(sections, { x: 0, xPercent: 0 }); // Remove horizontal transform
+
+                // Vertical Scroll Animations only
+                sections.forEach((section) => {
+                    const info = section.querySelector(".case-info");
+                    const img = section.querySelector(".img-box");
+
+                    // Elements fade in as you scroll down naturally
+                    if(info) {
+                        gsap.from(info, {
+                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out",
+                            scrollTrigger: { trigger: section, start: "top 75%" }
+                        });
+                    }
+                    if(img) {
+                        gsap.from(img, {
+                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out", delay: 0.1,
+                            scrollTrigger: { trigger: section, start: "top 80%" }
+                        });
+                    }
+                });
+                
+                // Hide progress bar on mobile
+                progressBar.style.width = "0%";
+            }
+        }
+
+        // Run on load
+        window.addEventListener("load", initExperience);
+
+        // Run on resize with debounce (to prevent glitching)
+        let resizeTimer;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(initExperience, 200);
+        });
+
+    </script>
 </body>
 </html>
