@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Codinec | Ultimate Hybrid</title>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
-    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
@@ -16,212 +14,475 @@
         :root {
             --bg: #050505;
             --text: #ffffff;
-            --text-muted: #888;
+            --text-muted: #888888;
             --accent: #00e5ff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            /* Mobile Friendly defaults */
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Nav --- */
+        /* ========== NAV ========== */
         nav {
-            position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 2rem;
-            display: flex; justify-content: space-between; z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
             mix-blend-mode: difference;
-            background: rgba(5,5,5,0.9);
-            backdrop-filter: blur(5px);
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
-        .logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.4rem; letter-spacing: -1px; }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -1px;
+        }
+
         .nav-btn {
-            text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 20px; border-radius: 50px; font-size: 0.9rem; transition: 0.3s;
+            text-decoration: none;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 7px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            transition: all 0.3s ease;
         }
-        .nav-btn:hover { background: white; color: black; }
 
-        /* --- PROGRESS BAR --- */
+        .nav-btn:hover {
+            background: white;
+            color: black;
+            border-color: white;
+        }
+
+        /* ========== PROGRESS BAR (Desktop Only) ========== */
         .progress-bar {
-            position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
-            width: 0%; z-index: 1001;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            width: 0%;
+            z-index: 1001;
+            display: none;
         }
 
-        /* =========================================
-           DEFAULT LAYOUT (MOBILE FIRST)
-           CSS yahan se shuru karta hai Mobile ke liye
-           ========================================= */
+        /* =========================================================
+           MOBILE FIRST DEFAULT LAYOUT
+           ========================================================= */
         .wrapper {
             display: flex;
-            flex-direction: column; /* Default: Vertical Stack */
-            height: auto;           /* Default: Auto Height */
+            flex-direction: column;
             width: 100%;
-            overflow: visible;      /* Default: Normal Scroll */
+            height: auto;
+            overflow: visible;
         }
 
         .panel {
             width: 100%;
-            /* Default: Auto height, min full screen */
-            height: auto;
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             position: relative;
-            padding: 7rem 1.5rem 3rem 1.5rem; /* Nav space ke liye top padding */
-            flex-direction: column; /* Content vertical stack */
-            border-bottom: 1px solid #1a1a1a;
+            padding: 5rem 1.5rem 3rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        /* --- Content Styling --- */
+        /* Background Number — ABSOLUTE inside panel */
+        .bg-num {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30vw;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.025);
+            font-family: 'Space Grotesk', sans-serif;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 0;
+            line-height: 1;
+        }
+
+        /* Image Box — SEPARATE from content */
+        .img-box {
+            width: 100%;
+            height: 240px;
+            background: #0e0e0e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+
+        .img-box:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Content */
         .content {
             z-index: 10;
-            max-width: 600px;
+            max-width: 100%;
             width: 100%;
             text-align: left;
+            position: relative;
         }
-        
+
         .badge {
-            display: inline-block; padding: 6px 16px; background: #1a1a1a; 
-            color: var(--accent); border-radius: 50px; font-size: 0.8rem;
-            margin-bottom: 1rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+            display: inline-block;
+            padding: 5px 14px;
+            background: rgba(0, 229, 255, 0.08);
+            color: var(--accent);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 50px;
+            font-size: 0.7rem;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
-        h2 { font-family: 'Space Grotesk'; font-size: 2.5rem; margin-bottom: 1.5rem; line-height: 1.1; font-weight: 700; }
-        p { color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem; font-size: 1rem; }
-        .link { text-decoration: none; color: white; border-bottom: 1px solid white; padding-bottom: 3px; font-size: 0.9rem; transition: 0.3s; }
-        .link:hover { color: var(--accent); border-color: var(--accent); }
-
-        /* Background Numbers */
-        .bg-num {
-            position: fixed; /* Fixed on mobile for parallax feel */
-            top: 10%; left: 50%; transform: translateX(-50%);
-            font-size: 20vw; font-weight: 700; color: rgba(255,255,255,0.03);
-            font-family: 'Space Grotesk'; pointer-events: none; white-space: nowrap; z-index: 0;
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            line-height: 1.15;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        /* Image Box */
-        .img-box { width: 100%; height: 35vh; background: #111; border-radius: 8px; overflow: hidden; margin-top: 2rem; order: -1; }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+        p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 300;
+            max-width: 480px;
+        }
 
-        /* Progress bar hide mobile par */
-        .progress-bar { display: none; }
+        .link {
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            padding-bottom: 3px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
 
+        .link:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
 
-        /* =========================================
-           DESKTOP OVERRIDES (> 768px)
-           JS/CSS yahan change karte hain Desktop ke liye
-           ========================================= */
+        /* CTA Button (Last Panel) */
+        .cta-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: white;
+            color: black;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 229, 255, 0.25);
+        }
+
+        /* Last panel special centering */
+        .panel--cta {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .panel--cta .content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .panel--cta p {
+            max-width: 400px;
+        }
+
+        .panel--cta h2 {
+            font-size: 2.2rem;
+        }
+
+        /* ========== Small phones (< 400px) ========== */
+        @media (max-width: 400px) {
+            .panel {
+                padding: 5rem 1rem 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.7rem;
+            }
+
+            p {
+                font-size: 0.88rem;
+            }
+
+            .img-box {
+                height: 200px;
+            }
+
+            .bg-num {
+                font-size: 35vw;
+            }
+        }
+
+        /* =========================================================
+           TABLET BREAKPOINT (641px - 768px)
+           Thoda bada layout
+           ========================================================= */
+        @media (min-width: 641px) and (max-width: 768px) {
+            .panel {
+                padding: 6rem 2.5rem 4rem;
+            }
+
+            .img-box {
+                height: 300px;
+            }
+
+            h2 {
+                font-size: 2.5rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .bg-num {
+                font-size: 25vw;
+            }
+        }
+
+        /* =========================================================
+           DESKTOP (> 768px) — HORIZONTAL PINNED SCROLL
+           ========================================================= */
         @media (min-width: 769px) {
-            
-            body { overflow-x: hidden; }
+            body {
+                overflow-x: hidden;
+            }
+
+            .progress-bar {
+                display: block;
+            }
+
+            nav {
+                padding: 1.5rem 3rem;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+            }
+
+            .nav-btn {
+                font-size: 0.9rem;
+                padding: 8px 22px;
+            }
 
             .wrapper {
-                flex-direction: row; /* Change to Horizontal */
-                height: 100vh;      /* Fixed Height for Pinning */
-                overflow: hidden;   /* Hide overflow */
+                flex-direction: row;
+                height: 100vh;
+                overflow: hidden;
+                will-change: transform;
             }
 
             .panel {
                 width: 100vw;
-                height: 100vh;      /* Full viewport height */
+                height: 100vh;
                 min-height: 100vh;
-                padding: 0 4rem;     /* Center content */
-                flex-direction: row; /* Horizontal content layout */
-                border-right: 1px solid #1a1a1a;
+                padding: 0 4rem;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                border-right: 1px solid rgba(255, 255, 255, 0.06);
                 border-bottom: none;
+                flex-shrink: 0;
             }
 
-            .content { max-width: 600px; }
-            
-            h2 { font-size: 3.5rem; }
-            
-            .img-box { 
-                width: 50vh; 
-                height: 60vh; 
-                margin-top: 0; 
-                margin-left: auto;
-                order: 2; /* Image right side */
+            .panel--cta {
+                justify-content: center;
             }
 
             .bg-num {
-                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                font-size: 25vw;
+                font-size: 22vw;
             }
 
-            .progress-bar { display: block; }
+            .img-box {
+                width: 42vw;
+                height: 58vh;
+                margin-bottom: 0;
+                margin-left: auto;
+                flex-shrink: 0;
+                border-radius: 12px;
+            }
+
+            .content {
+                max-width: 550px;
+                flex-shrink: 0;
+            }
+
+            h2 {
+                font-size: 3.2rem;
+                letter-spacing: -1px;
+            }
+
+            p {
+                font-size: 1.05rem;
+                margin-bottom: 2rem;
+            }
+
+            .panel--cta h2 {
+                font-size: 4rem;
+            }
+
+            .panel--cta p {
+                font-size: 1.15rem;
+                max-width: 500px;
+            }
+
+            .cta-btn {
+                padding: 14px 40px;
+                font-size: 1rem;
+            }
         }
 
+        /* Large Desktop (> 1200px) */
+        @media (min-width: 1200px) {
+            .panel {
+                padding: 0 6rem;
+            }
+
+            .img-box {
+                width: 40vw;
+                height: 62vh;
+            }
+
+            h2 {
+                font-size: 3.8rem;
+            }
+
+            .panel--cta h2 {
+                font-size: 5rem;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Progress Bar -->
     <div class="progress-bar"></div>
 
+    <!-- Navigation -->
     <nav>
         <div class="logo">Codinec.</div>
         <a href="#" class="nav-btn">Contact</a>
     </nav>
 
+    <!-- Wrapper -->
     <div class="wrapper">
         
         <!-- SLIDE 1 -->
         <section class="panel">
             <div class="bg-num">01</div>
+            <div class="img-box">
+                <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2072&auto=format&fit=crop" alt="Nexus Banking">
+            </div>
             <div class="content">
                 <span class="badge">Fintech</span>
                 <h2>Nexus Banking</h2>
                 <p>A secure, dark-mode-first banking interface designed for the next generation of crypto-native users.</p>
                 <a href="#" class="link">View Case Study</a>
-                <div class="img-box">
-                    <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2072&auto=format&fit=crop" alt="Project 1">
-                </div>
             </div>
         </section>
 
         <!-- SLIDE 2 -->
         <section class="panel">
             <div class="bg-num">02</div>
+            <div class="img-box">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop" alt="Velvet Store">
+            </div>
             <div class="content">
                 <span class="badge">E-Commerce</span>
                 <h2>Velvet Store</h2>
                 <p>Headless Shopify architecture enabling lightning fast page loads and 3D product previews.</p>
                 <a href="#" class="link">View Case Study</a>
-                <div class="img-box">
-                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop" alt="Project 2">
-                </div>
             </div>
         </section>
 
         <!-- SLIDE 3 -->
         <section class="panel">
             <div class="bg-num">03</div>
+            <div class="img-box">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" alt="Data Orbit">
+            </div>
             <div class="content">
                 <span class="badge">SaaS Platform</span>
                 <h2>Data Orbit</h2>
                 <p>Real-time analytics dashboard capable of visualizing millions of data points with zero latency.</p>
                 <a href="#" class="link">View Case Study</a>
-                <div class="img-box">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" alt="Project 3">
-                </div>
             </div>
         </section>
 
-        <!-- SLIDE 4 -->
-        <section class="panel">
+        <!-- SLIDE 4 — CTA -->
+        <section class="panel panel--cta">
             <div class="bg-num">04</div>
             <div class="content">
                 <span class="badge">Next Project</span>
                 <h2>Ready to scale?</h2>
                 <p>We are accepting new projects for Q4. Let's build something amazing together.</p>
-                <a href="#" class="nav-btn" style="background: white; color: black; border: none; margin-top: 1rem;">Start Now</a>
+                <a href="#" class="cta-btn">Start Now</a>
             </div>
         </section>
 
@@ -231,102 +492,197 @@
         gsap.registerPlugin(ScrollTrigger);
 
         function initScroll() {
-            // 1. Cleanup (Sab purana hata do)
+            // Purana sab kill karo
             ScrollTrigger.getAll().forEach(t => t.kill());
             gsap.killTweensOf(".wrapper");
             gsap.killTweensOf(".panel");
+            gsap.killTweensOf(".content");
+            gsap.killTweensOf(".img-box");
 
             const sections = gsap.utils.toArray(".panel");
             const container = document.querySelector(".wrapper");
             const progressBar = document.querySelector(".progress-bar");
-            
-            // 2. Device Detection
+
+            // Device check
             const isMobile = window.innerWidth <= 768;
 
-            // ============================================================
-            // MOBILE MODE: PURE NATIVE SCROLL
-            // CSS already handles layout. JS sirf clean karega.
-            // ============================================================
+            // ============================================
+            // MOBILE: Normal vertical scroll + fade-in
+            // ============================================
             if (isMobile) {
-                
-                // GSAP ke sab transforms ko hata do (Default HTML state par laao)
-                gsap.set(sections, { 
-                    clearProps: "all" // <--- Ye 'Nuclear' option hai. Sab inline styles hata dega.
-                });
 
-                // Simple Fade In Animation
+                // GSAP ke saare inline styles hata do
+                gsap.set(container, { clearProps: "all" });
+                gsap.set(sections, { clearProps: "all" });
+
+                // Saare content elements ko reset karo
                 sections.forEach((section) => {
                     const content = section.querySelector(".content");
-                    if(content) {
+                    const imgBox = section.querySelector(".img-box");
+                    if (content) gsap.set(content, { clearProps: "all" });
+                    if (imgBox) gsap.set(imgBox, { clearProps: "all" });
+                });
+
+                // Simple staggered fade-in for each panel
+                sections.forEach((section, index) => {
+                    const content = section.querySelector(".content");
+                    const imgBox = section.querySelector(".img-box");
+
+                    // Image fade in from bottom
+                    if (imgBox) {
+                        gsap.from(imgBox, {
+                            y: 40,
+                            opacity: 0,
+                            duration: 0.7,
+                            ease: "power2.out",
+                            scrollTrigger: {
+                                trigger: section,
+                                start: "top 80%",
+                                toggleActions: "play none none none"
+                            }
+                        });
+                    }
+
+                    // Content fade in (slightly delayed after image)
+                    if (content) {
                         gsap.from(content, {
-                            y: 30, opacity: 0, duration: 0.8, ease: "power2.out",
-                            scrollTrigger: { trigger: section, start: "top 85%" }
+                            y: 30,
+                            opacity: 0,
+                            duration: 0.7,
+                            delay: 0.15,
+                            ease: "power2.out",
+                            scrollTrigger: {
+                                trigger: section,
+                                start: "top 75%",
+                                toggleActions: "play none none none"
+                            }
                         });
                     }
                 });
-            } 
-            
-            // ============================================================
-            // DESKTOP MODE: CINEMATIC FAKE SCROLL + SNAP
-            // ============================================================
+
+                // Progress bar hide
+                progressBar.style.width = "0%";
+
+            }
+
+            // ============================================
+            // DESKTOP: Horizontal pinned scroll + snap
+            // ============================================
             else {
-                
-                // CSS se Desktop Layout pakka karo
-                gsap.set(container, { 
-                    display: "flex", 
-                    flexDirection: "row", 
-                    height: "100vh", 
-                    overflow: "hidden" 
+
+                // Desktop layout force karo via GSAP
+                gsap.set(container, {
+                    display: "flex",
+                    flexDirection: "row",
+                    height: "100vh",
+                    overflow: "hidden"
                 });
 
-                // Horizontal Movement Animation
+                gsap.set(sections, {
+                    clearProps: "all"
+                });
+
+                // Main horizontal scroll tween
                 const scrollTween = gsap.to(sections, {
                     xPercent: -100 * (sections.length - 1),
                     ease: "none",
                     scrollTrigger: {
                         trigger: container,
-                        pin: true,        // <--- PIN KAREGA
-                        scrub: 1,         // <--- SMOOTH CONNECTION
-                        snap: 1 / (sections.length - 1), // <--- SNAPPING ENABLED
-                        end: "+=" + container.offsetWidth,
-                        
-                        // Progress bar update
+                        pin: true,
+                        scrub: 1,
+                        snap: {
+                            snapTo: 1 / (sections.length - 1),
+                            duration: { min: 0.2, max: 0.6 },
+                            ease: "power1.inOut"
+                        },
+                        end: () => "+=" + container.offsetWidth,
+                        invalidateOnRefresh: true,
                         onUpdate: (self) => {
                             progressBar.style.width = (self.progress * 100) + "%";
                         }
                     }
                 });
 
-                // Content Reveal Animation (Slide by Slide)
+                // Per-slide content reveal
                 sections.forEach((section) => {
                     const content = section.querySelector(".content");
-                    if(content) {
-                        let anim = gsap.from(content, {
-                            x: 50, opacity: 0, duration: 1, ease: "power3.out"
+                    const imgBox = section.querySelector(".img-box");
+
+                    if (content) {
+                        let contentAnim = gsap.from(content, {
+                            x: 60,
+                            opacity: 0,
+                            duration: 1,
+                            ease: "power3.out"
                         });
                         ScrollTrigger.create({
                             trigger: section,
-                            containerAnimation: scrollTween, // Link to scroll tween
+                            containerAnimation: scrollTween,
                             start: "left center",
-                            animation: anim
+                            animation: contentAnim
+                        });
+                    }
+
+                    if (imgBox) {
+                        let imgAnim = gsap.from(imgBox, {
+                            scale: 0.9,
+                            opacity: 0,
+                            duration: 1.2,
+                            ease: "power3.out"
+                        });
+                        ScrollTrigger.create({
+                            trigger: section,
+                            containerAnimation: scrollTween,
+                            start: "left center",
+                            animation: imgAnim
+                        });
+                    }
+                });
+
+                // Background number parallax per slide
+                sections.forEach((section) => {
+                    const bgNum = section.querySelector(".bg-num");
+                    if (bgNum) {
+                        gsap.to(bgNum, {
+                            x: -100,
+                            ease: "none",
+                            scrollTrigger: {
+                                trigger: section,
+                                containerAnimation: scrollTween,
+                                start: "left right",
+                                end: "right left",
+                                scrub: true
+                            }
                         });
                     }
                 });
             }
         }
 
-        // Initialize on Load
+        // Load par init
         window.addEventListener("load", initScroll);
 
-        // Resize Handler (Debounce)
+        // Resize handler with debounce
         let resizeTimer;
         window.addEventListener("resize", () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                initScroll(); 
-            }, 200);
+                // Scroll position reset karo resize par
+                window.scrollTo(0, 0);
+                initScroll();
+            }, 250);
         });
 
+        // Orientation change (mobile)
+        if (screen.orientation) {
+            screen.orientation.addEventListener("change", () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    window.scrollTo(0, 0);
+                    initScroll();
+                }, 300);
+            });
+        }
     </script>
 </body>
 </html>
