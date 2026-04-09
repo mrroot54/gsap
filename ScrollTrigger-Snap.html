@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codinec | Portfolio</title>
+    
+    <!-- Fonts: Space Grotesk (Headings) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --accent: #00f0ff; /* Cyber Cyan */
+            --accent-sec: #7000ff; /* Electric Purple */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: -1px; }
+        .nav-btn { 
+            text-decoration: none; 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: white; color: black; }
+
+        /* --- Progress Line --- */
+        .progress-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent);
+            width: 0%;
+            z-index: 101;
+        }
+
+        /* --- Main Scroll Container --- */
+        .wrapper {
+            display: flex;
+            flex-wrap: nowrap;
+            width: 500%; /* 5 Sections */
+            height: 100vh;
+            will-change: transform;
+        }
+
+        /* --- Sections (Case Studies) --- */
+        .panel {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 4rem;
+            overflow: hidden;
+        }
+
+        /* Layout: Split Screen */
+        .panel-content {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr; /* Text 40%, Image 60% */
+            width: 100%;
+            max-width: 1400px;
+            align-items: center;
+            z-index: 2;
+        }
+
+        /* Typography */
+        .case-info {
+            padding-right: 2rem;
+        }
+
+        .case-cat {
+            color: var(--accent);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .case-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            max-width: 400px;
+        }
+
+        .view-link {
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid white;
+            padding-bottom: 2px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .view-link:hover { color: var(--accent); border-color: var(--accent); }
+
+        /* Images */
+        .image-container {
+            width: 100%;
+            height: 60vh;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .case-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* Background Big Number (Parallax) */
+        .bg-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 25vw; /* Huge size */
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.03);
+            z-index: 1;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* Specific Slide Styles */
+        .panel:nth-child(1) .bg-number { color: rgba(0, 240, 255, 0.04); }
+        .panel:nth-child(2) .bg-number { color: rgba(112, 0, 255, 0.04); }
+        .panel:nth-child(3) .bg-number { color: rgba(255, 0, 100, 0.04); }
+        .panel:nth-child(4) .bg-number { color: rgba(50, 255, 100, 0.04); }
+
+        /* Contact Slide (Last one) */
+        .panel:last-child {
+            flex-direction: column;
+            text-align: center;
+        }
+        .panel:last-child .bg-number { display: none; }
+        .panel:last-child h2 { font-size: 5rem; }
+        .panel:last-child .image-container { display: none; }
+
+        /* Hover Effect for Images */
+        .image-container:hover .case-img {
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .panel-content { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+            .case-info { padding-right: 0; order: 2; }
+            .image-container { order: 1; width: 80%; height: 40vh; }
+            h2 { font-size: 2.5rem; }
+            .case-desc { margin: 0 auto 2rem auto; }
+            .bg-number { top: 20%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-line"></div>
+
+    <nav>
+        <div class="logo">Codinec.</div>
+        <a href="#" class="nav-btn">Let's Talk</a>
+    </nav>
+
+    <div class="wrapper">
+        
+        <!-- CASE STUDY 01 -->
+        <section class="panel">
+            <div class="bg-number">01</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="case-cat">Fintech App</span>
+                    <h2>Nexus Banking<br>Redesign</h2>
+                    <p class="case-desc">A complete overhaul of a legacy banking UI, focusing on dark mode aesthetics and faster transaction flows.</p>
+                    <a href="#" class="view-link">View Case Study</a>
+                </div>
+                <div class="image-container">
+                    <!-- High quality placeholder -->
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" class="case-img" alt="Finance App">
+                </div>
+            </div>
+        </section>
+
+        <!-- CASE STUDY 02 -->
+        <section class="panel">
+            <div class="bg-number">02</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="case-cat">E-Commerce</span>
+                    <h2>Velvet Fashion<br>Store</h2>
+                    <p class="case-desc">Scalable Shopify headless solution for a luxury fashion brand with 3D product integration.</p>
+                    <a href="#" class="view-link">View Case Study</a>
+                </div>
+                <div class="image-container">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" class="case-img" alt="Fashion Store">
+                </div>
+            </div>
+        </section>
+
+        <!-- CASE STUDY 03 -->
+        <section class="panel">
+            <div class="bg-number">03</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="case-cat">SaaS Dashboard</span>
+                    <h2>Orbit Analytics<br>Platform</h2>
+                    <p class="case-desc">Real-time data visualization dashboard capable of handling millions of data points without lag.</p>
+                    <a href="#" class="view-link">View Case Study</a>
+                </div>
+                <div class="image-container">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" class="case-img" alt="Dashboard">
+                </div>
+            </div>
+        </section>
+
+        <!-- CASE STUDY 04 -->
+        <section class="panel">
+            <div class="bg-number">04</div>
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="case-cat">AI & Robotics</span>
+                    <h2>NeuroBot<br>Interface</h2>
+                    <p class="case-desc">Web-based control center for industrial robotics, featuring low-latency WebSocket communication.</p>
+                    <a href="#" class="view-link">View Case Study</a>
+                </div>
+                <div class="image-container">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" class="case-img" alt="Robotics">
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SLIDE -->
+        <section class="panel">
+            <div class="panel-content">
+                <div class="case-info">
+                    <span class="case-cat">Next Project</span>
+                    <h2>Have an idea?<br>Let's build it.</h2>
+                    <p class="case-desc" style="margin: 0 auto 2rem auto;">We are currently accepting new projects for Q4 2023.</p>
+                    <a href="mailto:hello@codinec.com" class="nav-btn" style="display: inline-block; background: white; color: black; border: none; font-size: 1.1rem; padding: 1rem 2.5rem;">Start a Project</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const sections = gsap.utils.toArray(".panel");
+        const progressBar = document.querySelector(".progress-line");
+
+        // --- 1. MAIN HORIZONTAL SCROLL (SNAP) ---
+        const scrollTween = gsap.to(sections, {
+            xPercent: -100 * (sections.length - 1),
+            ease: "none", // Instant reaction
+            scrollTrigger: {
+                trigger: ".wrapper",
+                pin: true,
+                scrub: true, // <--- Direct Response
+                snap: 1 / (sections.length - 1), // Snap effect
+                end: () => "+=" + document.querySelector(".wrapper").offsetWidth,
+                
+                // Update Progress Bar & Text Animation
+                onUpdate: (self) => {
+                    progressBar.style.width = (self.progress * 100) + "%";
+                }
+            }
+        });
+
+        // --- 2. PARALLAX FOR BACKGROUND NUMBERS ---
+        // Numbers move slower than the foreground content
+        document.querySelectorAll(".bg-number").forEach((num) => {
+            gsap.to(num, {
+                x: -300, // Move left opposite to scroll
+                ease: "none",
+                scrollTrigger: {
+                    trigger: ".wrapper",
+                    start: "top top",
+                    end: () => "+=" + document.querySelector(".wrapper").offsetWidth,
+                    scrub: true
+                }
+            });
+        });
+
+        // --- 3. TEXT & IMAGE REVEAL ANIMATIONS ---
+        // Har section ke andar cheezein jab active hon tab aayengi
+        sections.forEach((section, i) => {
+            
+            // Text elements
+            let textAnim = gsap.from(section.querySelector(".case-info").children, {
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out"
+            });
+
+            // Image scale up
+            let imgAnim = gsap.from(section.querySelector(".image-container"), {
+                scale: 0.8,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.out"
+            });
+
+            // Link animations to scroll position
+            ScrollTrigger.create({
+                trigger: section,
+                containerAnimation: scrollTween, // Important: link to horizontal scroll
+                start: "left center",
+                toggleActions: "play none none reverse",
+                animation: textAnim
+            });
+
+            ScrollTrigger.create({
+                trigger: section,
+                containerAnimation: scrollTween,
+                start: "left center",
+                toggleActions: "play none none reverse",
+                animation: imgAnim
+            });
+        });
+
+    </script>
+</body>
+</html>
